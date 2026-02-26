@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 import ticTacToeCube from './resources/tic-tac-toe-cube';
+import InformationModal from './resources/information-modal';
 
 const App = () => {
   const [playerNames, setPlayerNames] = useState<{ player1: string, player2: string }>({ player1: '', player2: '' });
@@ -9,8 +10,16 @@ const App = () => {
   const [numberForEachPlayer, setNumberForEachPlayer] = useState<{ player1: number, player2: number }>({ player1: 0, player2: 0 });
   const labels = {
     playerHasWonTheLeg: (playerName: string) => `${playerName} has won the leg and has been assigned X to start playing first`,
-    playerPick: (playerName: string) => `${playerName} please select any cube face to get your number`
+    playerPick: (playerName: string) => `${playerName} please select any cube face to get your number`,
+    legWinner: 'Leg Winner',
+    nextLeg: 'Next Leg',
+    confirmToInitializeGame: 'Confirm to proceed and start the game',
   };
+
+  const [isLegWinnerModalOpen, setIsLegWinnerModalOpen] = useState<boolean>(false);
+  const [isLegCubeVisible, setIsLegCubeVisible] = useState<boolean>(false);
+  const [mainGameStarted, setMainGameStarted] = useState<boolean>(false);
+  const [isGameSquareVisible, setIsGameSquareVisible] = useState<boolean>(false);
 
 
   const [cubeData, setCubeData] = useState({
@@ -93,6 +102,9 @@ const App = () => {
 
   useEffect(() => {
     if (numberForEachPlayer.player1 > 0 && numberForEachPlayer.player2 > 0) {
+      setIsLegWinnerModalOpen(true);
+      setIsLegCubeVisible(false);
+
       if (numberForEachPlayer.player1 > numberForEachPlayer.player2) {
         setPlayerNames(prev => ({ ...prev, player1Symbol: 'X', player2Symbol: 'O' }));
       } else {
@@ -119,11 +131,6 @@ const App = () => {
     return '';
   };
 
-  console.log('numberForEachPlayer', numberForEachPlayer)
-  console.log('getStatusMessage', getStatusMessage())
-  console.log('cubeData', cubeData)
-  console.log('playerNames', playerNames)
-
   return (
     <>
       {(playerNames.player1 === '' || playerNames.player2 === '') ? (
@@ -147,16 +154,27 @@ const App = () => {
           />
           <button onClick={() => setPlayerNamesAndGenerateNumbers()}>Submit Names</button>
         </div>
-      ) : (playerNames.player1 !== '' && playerNames.player2 !== '') ? (
+      ) : (playerNames.player1 !== '' && playerNames.player2 !== '' && isLegCubeVisible) ? (
         <div className="game-container">
           <h2>Players: {playerNames.player1} vs {playerNames.player2}</h2>
           <p>{getStatusMessage()}</p>
-          {ticTacToeCube({ cubeContent: cubeData, cubeOnClick: onSquareClick })}
+          {ticTacToeCube({ cubeContent: cubeData, cubeOnClick: onSquareClick, width: 50 })}
         </div>
-      ) : (<div>
-        Hi
-      </div>)}
-
+      ) : (
+        isLegWinnerModalOpen && (
+          <InformationModal
+            isOpen={isLegWinnerModalOpen}
+            onClose={() => {
+              setIsLegWinnerModalOpen(false);
+              setIsGameSquareVisible(false);
+              setMainGameStarted(true);
+            }}
+            title={labels.legWinner}
+            message={labels.playerHasWonTheLeg(getStatusMessage())}
+            onConfirmButtonText="Next Leg"
+          />
+        )
+      )}
     </>
   )
 }
