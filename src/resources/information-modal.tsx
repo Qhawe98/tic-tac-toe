@@ -14,23 +14,26 @@ type InformationModalProps = {
     onCancelButtonText?: string;
 }
 
-const InformationModal = ({ isOpen, onClose, title, message, onConfirm, onCancel, htmlElement, width, onCloseButtonText, onConfirmButtonText, onCancelButtonText }: InformationModalProps) => {
+const InformationModal = ({ isOpen, onClose, title, message, width, onConfirmButtonText }: InformationModalProps) => {
 
     return (
         <>
             {isOpen && (
-                <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal-content" style={{ width: width || '50vmin' }} onClick={(e) => e.stopPropagation()}>
+                <div className="modal-overlay">
+                    <div className="modal-content" style={{ width: width || '450px' }}>
                         <h2>{title}</h2>
-                        {htmlElement && htmlElement}
-                        <p>{message}</p>
+                        <div className="modal-body">
+                            <p>{message}</p>
+                        </div>
+
                         <div className="modal-buttons">
-                            {onConfirm && <button onClick={onConfirm}>{onConfirmButtonText || "Confirm"}</button>}
-                            {onCancel && <button onClick={onCancel}>{onCancelButtonText || "Cancel"}</button>}
-                            {!onConfirm && !onCancel && <button onClick={onClose}>{onCloseButtonText || "Ok"}</button>}
+                            <button onClick={onClose}>
+                                {onConfirmButtonText || "Start Main Game"}
+                            </button>
                         </div>
                     </div>
                 </div>
+
             )}
         </>
     );
